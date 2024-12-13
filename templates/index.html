@@ -10,21 +10,109 @@
     <link rel="stylesheet" href="{{ url_for('static', filename= 'css/style.css') }}">
     <script src="https://kit.fontawesome.com/d4203c72b8.js" crossorigin="anonymous"></script>
     <script src="https://cdn.canvasjs.com/canvasjs.min.js"></script>
+    <style>
+      body {
+        background-color: #ffe6f2;
+        color: #4a4a4a;
+        font-family: 'Arial', sans-serif;
+      }
+
+      header {
+        background-color: #ffc0cb;
+        border-radius: 8px;
+        padding: 10px 20px;
+      }
+
+      header a {
+        color: #721c24;
+        text-decoration: none;
+      }
+
+      .btn {
+        border: none;
+        border-radius: 5px;
+      }
+
+      .btn-light {
+        background-color: #ffccd5;
+        color: #721c24;
+      }
+
+      .btn-primary {
+        background-color: #ff85a2;
+        color: white;
+      }
+
+      .btn-outline-secondary {
+        border-color: #ff85a2;
+        color: #ff85a2;
+      }
+
+      .btn-outline-secondary:hover {
+        background-color: #ff85a2;
+        color: white;
+      }
+
+      input {
+        border: 1px solid #ff85a2;
+        border-radius: 4px;
+      }
+
+      .input-group-text {
+        background-color: #ffcce7;
+        color: #721c24;
+      }
+
+      footer {
+        background-color: #ffe6f2;
+        text-align: center;
+        padding: 10px;
+        border-top: 2px solid #ffcce7;
+      }
+
+      #chartContainer {
+        background-color: white;
+        border: 1px solid #ffcce7;
+        border-radius: 10px;
+        padding: 10px;
+        margin: 20px 0;
+      }
+
+      .fa-heart {
+        color: #ff85a2;
+      }
+
+      h5, h4 {
+        color: #4a4a4a;
+      }
+
+      .text-muted {
+        color: #b76e79 !important;
+      }
+
+      .sendArea button {
+        background-color: #ff85a2;
+        color: white;
+      }
+
+      .sendArea button:hover {
+        background-color: #ff6384;
+      }
+    </style>
   </head>
   <body>
-    
     <div class="col-lg-8 mx-auto p-3 py-md-5">
-      <header class="d-flex align-items-center pb-3 mb-5 border-bottom">
-        <a href="/" class="d-flex align-items-center text-dark text-decoration-none">
+      <header class="d-flex align-items-center pb-3 mb-5">
+        <a href="/" class="d-flex align-items-center text-decoration-none">
           <svg xmlns="http://www.w3.org/2000/svg" width="40" height="32" class="me-2" viewBox="0 0 118 94" role="img"><title>Bootstrap</title><path fill-rule="evenodd" clip-rule="evenodd" d="M24.509 0c-6.733 0-11.715 5.893-11.492 12.284.214 6.14-.064 14.092-2.066 20.577C8.943 39.365 5.547 43.485 0 44.014v5.972c5.547.529 8.943 4.649 10.951 11.153 2.002 6.485 2.28 14.437 2.066 20.577C12.794 88.106 17.776 94 24.51 94H93.5c6.733 0 11.714-5.893 11.491-12.284-.214-6.14.064-14.092 2.066-20.577 2.009-6.504 5.396-10.624 10.943-11.153v-5.972c-5.547-.529-8.934-4.649-10.943-11.153-2.002-6.484-2.28-14.437-2.066-20.577C105.214 5.894 100.233 0 93.5 0H24.508zM80 57.863C80 66.663 73.436 72 62.543 72H44a2 2 0 01-2-2V24a2 2 0 012-2h18.437c9.083 0 15.044 4.92 15.044 12.474 0 5.302-4.01 10.049-9.119 10.88v.277C75.317 46.394 80 51.21 80 57.863zM60.521 28.34H49.948v14.934h8.905c6.884 0 10.68-2.772 10.68-7.727 0-4.643-3.264-7.207-9.012-7.207zM49.948 49.2v16.458H60.91c7.167 0 10.964-2.876 10.964-8.281 0-5.406-3.903-8.178-11.425-8.178H49.948z" fill="currentColor"></path></svg>
           <span class="fs-4">Fetal Detection</span>
         </a>
       </header>
-      
+
       <main>
         <div class="row pb-3">
           <div class="col-4">
-            <button type="button" id="resetButton" class="btn btn-light" style="background-color: #f8d7da; color: #721c24;">Reset</button>
+            <button type="button" id="resetButton" class="btn btn-light">Reset</button>
           </div>
         </div>
 
@@ -38,14 +126,14 @@
           <div class="input-group col-6 mb-3">
             <input type="number" id="inputSession" placeholder="Session Id" inputmode="numeric">
           </div>
-          
+
           <div class="input-group col-6 mb-3">
             <input type="number" id="inputTime" class="form-control" placeholder="Duration of measurement">
             <span class="input-group-text" id="basic-addon2">sec</span>
             <button class="btn btn-outline-secondary" type="button" id="startButton">Start</button>
           </div>
         </div>
-      
+
         <div class="row">
           <div class="col-6 gy-4">
             <h5>Bluetooth State</h5>
@@ -54,7 +142,7 @@
             <h5 class="text-muted" id="bluetoothState">Checking</h5>
           </div>
         </div>
-      
+
         <div class="row">
           <div class="col-6 gy-4">
             <h5>Connection Status</h5>
@@ -63,9 +151,9 @@
             <h5 class="text-muted" id="connectionStatus">IDLE</h5>
           </div>
         </div>
-      
-        <div id="chartContainer" style="height: 370px; width: 100%;"></div>
-      
+
+        <div id="chartContainer"></div>
+
         <div class="row">
           <div class="col-6 gy-4 text-center">
             <i class="fa-solid fa-heart fa-2x"></i>
@@ -75,15 +163,16 @@
             </div>
           </div>
           <div class="col-6 gy-4 text-center">
-            <i class="fa-solid fa-2x"></i>
+            <i class="fa-solid fa-circle fa-2x"></i>
             <div>
               <h4>Button Count</h4>
               <h4 class="text-primary" id="countButton">0</h4>
             </div>
           </div>
         </div>
-
       </main>
+      
+
       <footer class="pt-2 my-5 text-muted border-top">
         Created by Aqib &middot; &copy; 2024
       </footer>
