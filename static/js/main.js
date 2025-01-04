@@ -279,7 +279,7 @@ async function BLEManager() {
     try {
       const device = await navigator.bluetooth.requestDevice({
         filters: [
-          { services: ['00001101-0000-1000-8000-00805F9B34FB'] },
+          { services: ['00001101-0000-1000-8000-00805f9b34fb'] },
         ] 
       })
       pairedDevices = device.name
@@ -289,15 +289,15 @@ async function BLEManager() {
       error_code = 2
       connectionStatus.classList.replace("text-secondary", "text-primary") 
       outputText.innerHTML = "Send 'start' to start measurement"
-      const service = await connectedDevice.getPrimaryService("00001101-0000-1000-8000-00805F9B34FB")
+      const service = await connectedDevice.getPrimaryService("00001101-0000-1000-8000-00805f9b34fb")
       console.log("Services obtained")
       error_code = 3
-      writeCharacteristic = await service.getCharacteristic("00001101-0000-1000-8000-00805F9B34FB")
+      writeCharacteristic = await service.getCharacteristic("00001101-0000-1000-8000-00805f9b34fb")
       console.log("Write Characteristics discovered")
       let textEncoder = new TextEncoder()
       let value = textEncoder.encode(input.value)
       writeCharacteristic.writeValueWithoutResponse(value)
-      const readCharacteristic = await service.getCharacteristic("00001101-0000-1000-8000-00805F9B34FB")
+      const readCharacteristic = await service.getCharacteristic("00001101-0000-1000-8000-00805f9b34fb")
       console.log("Read Characteristics discovered")
       error_code = 4
       const output = await readCharacteristic.startNotifications()
