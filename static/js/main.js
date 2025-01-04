@@ -278,10 +278,8 @@ async function BLEManager() {
     error_code = 0
     try {
       const device = await navigator.bluetooth.requestDevice({
-        filters: [
-          { services: ['6e400001-b5a3-f393-e0a9-e50e24dcca9e'] },
-        ] 
-      })
+  acceptAllDevices: true, // Shows all Bluetooth devices
+});
       pairedDevices = device.name
       error_code = 1
       const connectedDevice = await device.gatt.connect()
