@@ -273,52 +273,73 @@ document.addEventListener('DOMContentLoaded', function() {
 
 
 async function BLEManager() {
-    connectionStatus.textContent = "SEARCHING"
-    connectionStatus.classList.replace("text-muted", "text-secondary") 
-    error_code = 0
-    try {
-      const device = await navigator.bluetooth.requestDevice({
-        filters: [
-          { services: ['00001101-0000-1000-8000-00805f9b34fb'] },
-        ] 
-      })
-      pairedDevices = device.name
-      error_code = 1
-      const connectedDevice = await device.gatt.connect()
-      connectionStatus.textContent = "CONNECTED"
-      error_code = 2
-      connectionStatus.classList.replace("text-secondary", "text-primary") 
-      outputText.innerHTML = "Send 'start' to start measurement"
-      const service = await connectedDevice.getPrimaryService("00001101-0000-1000-8000-00805f9b34fb")
-      console.log("Services obtained")
-      error_code = 3
-      writeCharacteristic = await service.getCharacteristic("00001101-0000-1000-8000-00805f9b34fb")
-      console.log("Write Characteristics discovered")
-      let textEncoder = new TextEncoder()
-      let value = textEncoder.encode(input.value)
-      writeCharacteristic.writeValueWithoutResponse(value)
-      const readCharacteristic = await service.getCharacteristic("00001101-0000-1000-8000-00805f9b34fb")
-      console.log("Read Characteristics discovered")
-      error_code = 4
-      const output = await readCharacteristic.startNotifications()
-      outputText.classList.replace("text-muted","text-success")
-      error_code = 5
-      readCharacteristic.addEventListener('characteristicvaluechanged', handleCharacteristicValueChanged)
-      error_code = 6
-      console.log("notification started successfully")
-    }
-    catch(e) {
-      console.log("err_code",error_code)
-      console.log(e)
-      if (typeof device !== 'undefined') {
-        connectionStatus.textContent = "CONNECTION FAILED"
+  connectionStatus.textContent = "SEARCHING";
+  connectionStatus.classList.replace("text-muted", "text-secondary");
+  let error_code = 0;
+  let device;
+
+  try {
+      // Request any nearby Bluetooth device
+      device = await navigator.bluetooth.requestDevice({
+          acceptAllDevices: true, // Accept any device
+          optionalServices: [] // Leave empty to dynamically fetch available services
+      });
+
+      // Update connection status
+      connectionStatus.textContent = "CONNECTING...";
+      pairedDevices = device.name;
+      error_code = 1;
+
+      // Connect to the GATT server
+      const connectedDevice = await device.gatt.connect();
+      connectionStatus.textContent = "CONNECTED";
+      connectionStatus.classList.replace("text-secondary", "text-primary");
+      outputText.innerHTML = "Send 'start' to start measurement";
+      error_code = 2;
+
+      // Dynamically fetch all primary services
+      const services = await connectedDevice.getPrimaryServices();
+      console.log("Available Services:", services);
+
+      // Iterate through services to find characteristics
+      for (const service of services) {
+          console.log(`Service UUID: ${service.uuid}`);
+
+          // Try to get the characteristics for each service
+          const characteristics = await service.getCharacteristics();
+          for (const characteristic of characteristics) {
+              console.log(`Characteristic UUID: ${characteristic.uuid}`);
+
+              // Example: Check if the characteristic supports writing and notifications
+              if (characteristic.properties.writeWithoutResponse) {
+                  console.log("Write characteristic found. Writing value...");
+                  const textEncoder = new TextEncoder();
+                  const value = textEncoder.encode(input.value);
+                  await characteristic.writeValueWithoutResponse(value);
+              }
+
+              if (characteristic.properties.notify) {
+                  console.log("Notification characteristic found. Starting notifications...");
+                  await characteristic.startNotifications();
+                  characteristic.addEventListener('characteristicvaluechanged', handleCharacteristicValueChanged);
+              }
+          }
       }
-      else {
-        connectionStatus.textContent = "CANCELLED"
+  } catch (error) {
+      // Handle errors gracefully
+      console.error("Error during BLE operation:", error);
+      console.log("Error code:", error_code);
+
+      if (device) {
+          connectionStatus.textContent = "CONNECTION FAILED";
+          connectionStatus.classList.replace("text-primary", "text-danger");
+      } else {
+          connectionStatus.textContent = "CANCELLED";
+          connectionStatus.classList.replace("text-secondary", "text-danger");
       }
-    }
-    
   }
+}
+
 
 
   controlButton.addEventListener("click", BLEManager)
